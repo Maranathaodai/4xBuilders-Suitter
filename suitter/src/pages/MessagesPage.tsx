@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Send, Search, Plus, MoreVertical, ArrowLeft, Image as ImageIcon, AlertCircle } from 'lucide-react'
-import { formatDistanceToNow, format } from 'date-fns'
+import { format } from 'date-fns'
 import { getConversations, getMessages, mockUsers, type Conversation, type Message, type User } from '@/lib/mockData'
 import { useAuth } from '@/context/AuthContext'
 import { useMessaging } from '@/hooks/use-messaging'
@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/useToast'
 
 export default function MessagesPage() {
   const { currentUser } = useAuth()
-  const { messagingClient, isReady, isLoading: isMessagingLoading } = useMessaging()
+  const { isReady, isLoading: isMessagingLoading } = useMessaging()
   const { createConversation, sendMessage: sendMessageOnChain, getConversations: getConversationsFromChain, getMessages: getMessagesFromChain } = useSui()
   const { toast } = useToast()
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -51,7 +51,12 @@ export default function MessagesPage() {
                 address: otherParticipant,
                 displayName: otherParticipant.slice(0, 6) + '...',
                 username: otherParticipant.slice(0, 6),
+                bio: '',
                 avatar: '',
+                banner: '',
+                joinedAt: new Date(),
+                followersCount: 0,
+                followingCount: 0,
               }
               
               return {
@@ -99,7 +104,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     const loadMessages = async () => {
-      if (selectedConversation) {
+      if (selectedConversation && currentUser) {
         try {
           // Try to load from blockchain if conversation ID looks like a blockchain ID
           if (selectedConversation.id.startsWith('0x')) {
@@ -107,10 +112,10 @@ export default function MessagesPage() {
             if (blockchainMessages.length > 0) {
               // Convert blockchain messages to app format
               const formattedMessages: Message[] = blockchainMessages.map((msg: any) => {
-                const sender = msg.sender === currentUser?.address ? currentUser : 
-                  selectedConversation.participants.find(p => p.address === msg.sender) || currentUser
-                const recipient = msg.recipient === currentUser?.address ? currentUser :
-                  selectedConversation.participants.find(p => p.address === msg.recipient) || currentUser
+                const sender = msg.sender === currentUser.address ? currentUser : 
+                  selectedConversation.participants.find((p: User) => p.address === msg.sender) || currentUser
+                const recipient = msg.recipient === currentUser.address ? currentUser :
+                  selectedConversation.participants.find((p: User) => p.address === msg.recipient) || currentUser
                 
                 return {
                   id: msg.id,
@@ -164,7 +169,6 @@ export default function MessagesPage() {
       toast({
         title: 'Error',
         description: 'Please select a conversation or user first',
-        variant: 'destructive',
       })
       return
     }
@@ -212,7 +216,6 @@ export default function MessagesPage() {
           toast({
             title: 'Warning',
             description: 'Failed to create conversation on blockchain. Using local storage.',
-            variant: 'default',
           })
         }
       }
@@ -231,9 +234,9 @@ export default function MessagesPage() {
             if (blockchainMessages.length > 0) {
               const formattedMessages: Message[] = blockchainMessages.map((msg: any) => {
                 const sender = msg.sender === currentUser?.address ? currentUser : 
-                  (selectedConversation?.participants.find(p => p.address === msg.sender) || currentUser)
+                  (selectedConversation?.participants.find((p: User) => p.address === msg.sender) || currentUser)
                 const recipient = msg.recipient === currentUser?.address ? currentUser :
-                  (selectedConversation?.participants.find(p => p.address === msg.recipient) || currentUser)
+                  (selectedConversation?.participants.find((p: User) => p.address === msg.recipient) || currentUser)
                 
                 return {
                   id: msg.id,
@@ -262,7 +265,6 @@ export default function MessagesPage() {
           toast({
             title: 'Warning',
             description: 'Failed to send message on blockchain. Using local storage.',
-            variant: 'default',
           })
         }
       }
@@ -343,7 +345,6 @@ export default function MessagesPage() {
       toast({
         title: 'Error',
         description: 'Failed to send message. Please try again.',
-        variant: 'destructive',
       })
     } finally {
       setSending(false)
@@ -363,13 +364,13 @@ export default function MessagesPage() {
 
   const filteredConversations = conversations.filter(conv => {
     if (!searchQuery) return true
-    const other = conv.participants.find(p => p.id !== currentUser?.id)
+    const other = conv.participants.find((p: User) => p.id !== currentUser?.id)
     return other?.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
            other?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
            conv.lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase())
   })
 
-  const otherParticipant = selectedConversation?.participants.find(p => p.id !== currentUser?.id) || selectedUser
+  const otherParticipant = selectedConversation?.participants.find((p: User) => p.id !== currentUser?.id) || selectedUser
 
   const formatMessageTime = (date: Date) => {
     const now = new Date()
@@ -414,7 +415,9 @@ export default function MessagesPage() {
                 <Skeleton className="w-5 h-5 rounded-full" />
               )}
               {!isMessagingLoading && !isReady && (
-                <AlertCircle className="w-5 h-5 text-yellow-500" title="Blockchain messaging unavailable" />
+                <div title="Blockchain messaging unavailable">
+                  <AlertCircle className="w-5 h-5 text-yellow-500" />
+                </div>
               )}
               <Button
                 variant="ghost"
@@ -487,7 +490,7 @@ export default function MessagesPage() {
           ) : (
             <div className="divide-y divide-border">
               {filteredConversations.map(conversation => {
-                const other = conversation.participants.find(p => p.id !== currentUser?.id)
+                const other = conversation.participants.find((p: User) => p.id !== currentUser?.id)
                 return (
                   <button
                     key={conversation.id}

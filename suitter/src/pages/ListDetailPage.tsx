@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { PostCard } from '@/components/PostCard'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { ArrowLeft, List, Users, Plus, X } from 'lucide-react'
+import { ArrowLeft, List, Users, X } from 'lucide-react'
 import { mockUsers, getPosts, type Post, type User } from '@/lib/mockData'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/useToast'
@@ -162,25 +162,25 @@ export default function ListDetailPage() {
     })
   }
 
-  const handleShare = (postId: string) => {
+  const handleShare = (_postId: string) => {
     toast({
       description: 'Post shared',
     })
   }
 
-  const handleMute = (userId: string) => {
+  const handleMute = (_userId: string) => {
     toast({
       description: 'User muted',
     })
   }
 
-  const handleBlock = (userId: string) => {
+  const handleBlock = (_userId: string) => {
     toast({
       description: 'User blocked',
     })
   }
 
-  const handleReport = (postId: string) => {
+  const handleReport = (_postId: string) => {
     toast({
       description: 'Post reported',
     })

@@ -69,7 +69,7 @@ export default function ProfilePage() {
   const [editWebsite, setEditWebsite] = useState('')
   const [editAvatar, setEditAvatar] = useState('')
   const [editBanner, setEditBanner] = useState('')
-  const [following, setFollowing] = useState<Set<string>>(new Set())
+  const [_following, _setFollowing] = useState<Set<string>>(new Set())
   const { getProfile } = useSui()
   
   const isOwnProfile = !id || id === currentUser?.id
@@ -354,26 +354,6 @@ export default function ProfilePage() {
     toast({
       description: 'Post deleted',
     })
-  }
-
-  const _handleFollowUser = (userId: string) => {
-    const isFollowingUser = following.has(userId)
-    
-    if (isFollowingUser) {
-      setFollowing(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(userId)
-        return newSet
-      })
-      toast({
-        description: 'User unfollowed',
-      })
-    } else {
-      setFollowing(prev => new Set(prev).add(userId))
-      toast({
-        description: 'User followed',
-      })
-    }
   }
 
   const handleCreateProfile = async () => {

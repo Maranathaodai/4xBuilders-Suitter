@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
 import { Button } from './ui/Button'
-import { User } from '@/lib/types'
 import { mockUsers } from '@/lib/mockData'
 
 export function WhoToFollow() {

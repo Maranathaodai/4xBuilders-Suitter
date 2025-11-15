@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { TrendingUp, Flame, Hash, ArrowUpRight } from 'lucide-react'
+import { Flame, Hash, ArrowUpRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const trendingTopics = [

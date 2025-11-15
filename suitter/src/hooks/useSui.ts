@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client'
 import { Transaction } from '@mysten/sui/transactions'
 import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit'
-import { User, Post, Reply } from '@/lib/types'
+import { User, Post } from '@/lib/types'
 import { 
   createProfileOnChain,
   updateProfileOnChain,
@@ -10,9 +10,6 @@ import {
   likePostOnChain, 
   addCommentOnChain,
   fetchPostsFromChain,
-  fetchLikesForPost,
-  fetchCommentsForPost,
-  fetchUserProfile,
   createConversationOnChain,
   sendMessageOnChain,
   fetchConversations,
@@ -41,7 +38,7 @@ export function useSui() {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction()
 
   // Profile operations
-  const createProfile = useCallback(async (displayName: string, bio: string, avatar?: string, banner?: string): Promise<string> => {
+  const createProfile = useCallback(async (displayName: string, bio: string, avatar?: string, _banner?: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -91,7 +88,7 @@ export function useSui() {
     return result.digest
   }, [currentAccount, signAndExecuteTransaction])
 
-  const updateProfile = useCallback(async (profileId: string, displayName: string, bio: string, avatar: string): Promise<string> => {
+  const updateUserProfile = useCallback(async (displayName: string, bio: string, avatar: string, _banner: string) => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -119,10 +116,15 @@ export function useSui() {
       }
     }
     
+    const profileIdValue = await getProfileId(client, PROFILE_REGISTRY_ID, currentAccount.address)
+    if (!profileIdValue) {
+      throw new Error('Profile not found')
+    }
+    
     const result = await updateProfileOnChain(
       client,
       signer as any,
-      profileId,
+      profileIdValue,
       displayName,
       bio,
       avatar
@@ -197,7 +199,7 @@ export function useSui() {
   }, [])
 
   // Post operations
-  const createPost = useCallback(async (content: string, images: string[] = []): Promise<{ digest: string; objectId: string }> => {
+  const createPost = useCallback(async (content: string, _images: string[]) => {
     console.log('useSui.createPost called')
     console.log('currentAccount:', currentAccount)
     console.log('signAndExecuteTransaction available:', !!signAndExecuteTransaction)
@@ -265,7 +267,7 @@ export function useSui() {
     }
   }, [currentAccount, signAndExecuteTransaction])
 
-  const deletePost = useCallback(async (postId: string): Promise<string> => {
+  const deletePost = useCallback(async (_postId: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -349,7 +351,7 @@ export function useSui() {
     return result.digest
   }, [currentAccount, signAndExecuteTransaction])
 
-  const unlikePost = useCallback(async (postId: string): Promise<string> => {
+  const unlikePost = useCallback(async (_postId: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -370,7 +372,7 @@ export function useSui() {
     })
   }, [currentAccount, signAndExecuteTransaction])
 
-  const resharePost = useCallback(async (postId: string): Promise<string> => {
+  const resharePost = useCallback(async (_postId: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -391,7 +393,7 @@ export function useSui() {
     })
   }, [currentAccount, signAndExecuteTransaction])
 
-  const commentOnPost = useCallback(async (postId: string, content: string, images: string[] = []): Promise<string> => {
+  const commentOnPost = useCallback(async (postId: string, content: string, _images: string[] = []): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -430,7 +432,7 @@ export function useSui() {
   }, [currentAccount, signAndExecuteTransaction])
 
   // Follow operations
-  const followUser = useCallback(async (userId: string): Promise<string> => {
+  const followUser = useCallback(async (_userId: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -451,7 +453,7 @@ export function useSui() {
     })
   }, [currentAccount, signAndExecuteTransaction])
 
-  const unfollowUser = useCallback(async (userId: string): Promise<string> => {
+  const unfollowUser = useCallback(async (_userId: string) => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -472,29 +474,23 @@ export function useSui() {
     })
   }, [currentAccount, signAndExecuteTransaction])
 
-  const getFollowers = useCallback(async (userId: string, limit = 20, offset = 0): Promise<User[]> => {
-    const client = getSuiClient()
-    
+  const getFollowers = useCallback(async (_userId: string, _limit = 20, _offset = 0): Promise<User[]> => {
     // TODO: Query on-chain followers
     return []
   }, [])
 
-  const getFollowing = useCallback(async (userId: string, limit = 20, offset = 0): Promise<User[]> => {
-    const client = getSuiClient()
-    
+  const getFollowing = useCallback(async (_userId: string, _limit = 20, _offset = 0): Promise<User[]> => {
     // TODO: Query on-chain following
     return []
   }, [])
 
   // Notification operations
-  const getNotifications = useCallback(async (limit = 20, offset = 0) => {
-    const client = getSuiClient()
-    
+  const getNotifications = useCallback(async (_limit = 20, _offset = 0) => {
     // TODO: Query on-chain notifications
     return []
   }, [])
 
-  const markNotificationRead = useCallback(async (notificationId: string): Promise<string> => {
+  const markNotificationRead = useCallback(async (_notificationId: string): Promise<string> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -516,8 +512,7 @@ export function useSui() {
   }, [currentAccount, signAndExecuteTransaction])
 
   // Estimate gas for a transaction
-  const estimateGas = useCallback(async (tx: Transaction): Promise<bigint> => {
-    const client = getSuiClient()
+  const estimateGas = useCallback(async (_tx: Transaction): Promise<bigint> => {
     if (!currentAccount) {
       throw new Error('Wallet not connected')
     }
@@ -627,7 +622,7 @@ export function useSui() {
   return {
     // Profile
     createProfile,
-    updateProfile,
+    updateProfile: updateUserProfile,
     getProfile,
     checkProfileExists,
     getUserProfileId,

@@ -1,4 +1,7 @@
-import { User, Post, Notification, Conversation, NFT } from './types'
+import { User, Post, Notification, Conversation, NFT, Message } from './types'
+
+// Re-export types for use in other files
+export type { User, Post, Notification, Conversation, Message }
 
 export const mockUsers: User[] = [
   {
@@ -714,6 +717,6 @@ export function getMediaPostsByUserId(userId: string): Post[] {
   return mockMediaPosts.filter(post => post.authorId === userId)
 }
 
-export function getLikedPostsByUserId(userId: string): Post[] {
+export function getLikedPostsByUserId(_userId: string): Post[] {
   return mockLikedPosts
 }

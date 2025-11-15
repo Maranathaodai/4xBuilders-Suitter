@@ -9,7 +9,6 @@ import { Search, TrendingUp, Hash, Flame, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getPosts, mockUsers, type Post, type User } from '@/lib/mockData'
 import { useDebounce } from '@/hooks/useDebounce'
-import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/useToast'
 
 export default function ExplorePage() {
@@ -18,7 +17,7 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState(urlQuery)
   const [searchResults, setSearchResults] = useState<{ posts: Post[]; users: User[] }>({ posts: [], users: [] })
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([])
-  const [trendingTopics, setTrendingTopics] = useState<Array<{ name: string; posts: number }>>([
+  const [trendingTopics, _setTrendingTopics] = useState<Array<{ name: string; posts: number }>>([
     { name: 'Sui', posts: 12500 },
     { name: 'Web3', posts: 8900 },
     { name: 'NFT', posts: 5670 },
@@ -147,25 +146,25 @@ export default function ExplorePage() {
     })
   }
 
-  const handleShare = (postId: string) => {
+  const handleShare = (_postId: string) => {
     toast({
       description: 'Post shared',
     })
   }
 
-  const handleMute = (userId: string) => {
+  const handleMute = (_userId: string) => {
     toast({
       description: 'User muted',
     })
   }
 
-  const handleBlock = (userId: string) => {
+  const handleBlock = (_userId: string) => {
     toast({
       description: 'User blocked',
     })
   }
 
-  const handleReport = (postId: string) => {
+  const handleReport = (_postId: string) => {
     toast({
       description: 'Post reported',
     })

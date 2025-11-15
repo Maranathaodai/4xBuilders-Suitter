@@ -17,7 +17,8 @@ interface WalletModalProps {
 
 export function WalletModal({ open, onOpenChange }: WalletModalProps) {
   const { mutate: connect } = useConnectWallet()
-  const { wallets, currentWallet } = useWallets()
+  const wallets = useWallets()
+  const currentWallet = wallets.find((w) => w.accounts && w.accounts.length > 0) || null
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -37,7 +38,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
         return
       }
       
-      const wallet = wallets.find(w => w.name === walletName)
+      const wallet = wallets.find((w: any) => w.name === walletName)
       if (!wallet) {
         setError(`Wallet ${walletName} not found`)
         setConnectingWalletId(null)
@@ -63,7 +64,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
     }
   }
 
-  const availableWallets = wallets?.filter(w => w.installed) || []
+  const availableWallets = wallets?.filter((w: any) => w.installed) || []
   const isConnected = currentWallet !== null
 
   return (
@@ -81,7 +82,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
 
         <div className="mt-4 space-y-3">
           {availableWallets.length > 0 ? (
-            availableWallets.map((wallet) => {
+            availableWallets.map((wallet: any) => {
               const isConnecting = connectingWalletId === wallet.name
               const isCurrentWallet = currentWallet?.name === wallet.name
               

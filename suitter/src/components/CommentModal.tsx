@@ -29,10 +29,10 @@ interface CommentModalProps {
 export function CommentModal({ 
   open, 
   onOpenChange, 
-  post, 
+  post: _post, 
   onCommentAdded,
   isReply = false,
-  parentReplyId 
+  parentReplyId: _parentReplyId 
 }: CommentModalProps) {
   const { currentUser } = useAuth()
   const { toast } = useToast()

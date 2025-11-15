@@ -49,25 +49,25 @@ export default function BookmarksPage() {
     })
   }
 
-  const handleShare = (postId: string) => {
+  const handleShare = (_postId: string) => {
     toast({
       description: 'Post shared',
     })
   }
 
-  const handleMute = (userId: string) => {
+  const handleMute = (_userId: string) => {
     toast({
       description: 'User muted',
     })
   }
 
-  const handleBlock = (userId: string) => {
+  const handleBlock = (_userId: string) => {
     toast({
       description: 'User blocked',
     })
   }
 
-  const handleReport = (postId: string) => {
+  const handleReport = (_postId: string) => {
     toast({
       description: 'Post reported',
     })
